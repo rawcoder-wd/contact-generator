@@ -1,0 +1,19 @@
+{
+    "name": "cardzen/contact-downloader",
+    "description": "Vcf generator for CardZen.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "CardZen\\ContactDownloader\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.4",
+        "illuminate/support": "^7.0|^8.0|^9.0|^10.0|^11"
+    },
+    "minimum-stability": "dev",
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    }
+}
