@@ -220,7 +220,6 @@ class ContactDownloader
         }
         if (isset($this->title)) {
             $vcfContent .= "\nTITLE:" . $this->title;
-            $vcfContent .= "\nROLE:" . $this->title;
         }
         if (isset($this->company)) {
             $vcfContent .= "\nORG:" . $this->company;
