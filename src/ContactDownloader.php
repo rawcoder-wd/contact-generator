@@ -6,19 +6,17 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
 
-class ContactDownloader 
+class ContactDownloader
 {
-    private string $full_name;
-    private array $emails = [];
-    private array $phones = [];
-    private string $address = '';
-    private string $title = '';
-    private string $description = '';
-    private string $profile_image_150x150 = '';
-    private array $social = [];
-
-    const WORK = 'WORK';
-    const HOME = 'HOME';
+    private $full_name;
+    private $emails = [];
+    private $phones = [];
+    private $address = '';
+    private $title = '';
+    private $company = '';
+    private $description = '';
+    private $profile_image = '';
+    private $social = [];
 
     /**
      * Set the full name for the VCF.
@@ -26,7 +24,7 @@ class ContactDownloader
      * @param string $full_name
      * @return $this
      */
-    public function setFullName(string $full_name): self
+    public function setFullName($full_name): self
     {
         $this->full_name = $full_name;
         return $this;
@@ -39,7 +37,7 @@ class ContactDownloader
      * @param string $type
      * @return $this
      */
-    public function setEmail(string $email, string $type): self
+    public function setEmail($email, $type): self
     {
         $this->emails[] = [
             'value' => $email,
@@ -55,7 +53,7 @@ class ContactDownloader
      * @param string $type
      * @return $this
      */
-    public function setPhoneNumber(string $phone, string $type): self
+    public function setPhoneNumber($phone, $type): self
     {
         $this->phones[] = [
             'value' => $phone,
@@ -70,7 +68,7 @@ class ContactDownloader
      * @param string $address
      * @return $this
      */
-    public function setAddress(string $address): self
+    public function setAddress($address): self
     {
         $this->address = $address;
         return $this;
@@ -82,9 +80,21 @@ class ContactDownloader
      * @param string $title
      * @return $this
      */
-    public function setTitle(string $title): self
+    public function setTitle($title): self
     {
         $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * Set the company for the VCF.
+     *
+     * @param string $company
+     * @return $this
+     */
+    public function setCompany($company): self
+    {
+        $this->company = $company;
         return $this;
     }
 
@@ -94,7 +104,7 @@ class ContactDownloader
      * @param string $description
      * @return $this
      */
-    public function setDescription(string $description): self
+    public function setDescription($description): self
     {
         $this->description = $description;
         return $this;
@@ -103,12 +113,12 @@ class ContactDownloader
     /**
      * Set the profile image for the VCF.
      *
-     * @param string $profile_image_150x150
+     * @param string $profile_image
      * @return $this
      */
-    public function setProfileImage150x150(string $profile_image_150x150): self
+    public function setProfileImage($profile_image): self
     {
-        $this->profile_image_150x150 = $profile_image_150x150;
+        $this->profile_image = $profile_image;
         return $this;
     }
 
@@ -118,7 +128,7 @@ class ContactDownloader
      * @param string $url
      * @return $this
      */
-    public function setFacebook(string $url): self
+    public function setFacebook($url): self
     {
         $this->social['facebook'] = $url;
         return $this;
@@ -130,7 +140,7 @@ class ContactDownloader
      * @param string $url
      * @return $this
      */
-    public function setTwitter(string $url): self
+    public function setTwitter($url): self
     {
         $this->social['twitter'] = $url;
         return $this;
@@ -142,7 +152,7 @@ class ContactDownloader
      * @param string $url
      * @return $this
      */
-    public function setLinkedin(string $url): self
+    public function setLinkedin($url): self
     {
         $this->social['linkedin'] = $url;
         return $this;
@@ -154,7 +164,7 @@ class ContactDownloader
      * @param string $url
      * @return $this
      */
-    public function setYoutube(string $url): self
+    public function setYoutube($url): self
     {
         $this->social['youtube'] = $url;
         return $this;
@@ -166,7 +176,7 @@ class ContactDownloader
      * @param string $url
      * @return $this
      */
-    public function setInstagram(string $url): self
+    public function setInstagram($url): self
     {
         $this->social['instagram'] = $url;
         return $this;
@@ -178,7 +188,7 @@ class ContactDownloader
      * @param string $url
      * @return $this
      */
-    public function setWebsite(string $url): self
+    public function setWebsite($url): self
     {
         $this->social['website'] = $url;
         return $this;
@@ -190,7 +200,7 @@ class ContactDownloader
      * @param string $url
      * @return $this
      */
-    public function setSkype(string $url): self
+    public function setSkype($url): self
     {
         $this->social['skype'] = $url;
         return $this;
@@ -210,6 +220,9 @@ class ContactDownloader
         }
         if (isset($this->title)) {
             $vcfContent .= "\nTITLE:" . $this->title;
+        }
+        if (isset($this->company)) {
+            $vcfContent .= "\nCOMPANY:" . $this->company;
         }
         if (isset($this->description)) {
             $vcfContent .= "\nNOTE:" . $this->description;
@@ -239,8 +252,8 @@ class ContactDownloader
                 }
             }
         }
-        if (isset($this->profile_image_150x150) && File::exists($this->profile_image_150x150)) {
-            $vcfContent .= "\nPHOTO;TYPE=PNG;ENCODING=b:" . base64_encode(File::get($this->profile_image_150x150));
+        if (isset($this->profile_image) && File::exists($this->profile_image)) {
+            $vcfContent .= "\nPHOTO;TYPE=PNG;ENCODING=b:" . base64_encode(File::get($this->profile_image));
         }
         $vcfContent .= "\nEND:VCARD";
 
@@ -288,7 +301,7 @@ class ContactDownloader
      * @param string $email
      * @return bool
      */
-    public function validateEmail(string $email): bool
+    public function validateEmail($email): bool
     {
         return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
     }
@@ -299,7 +312,7 @@ class ContactDownloader
      * @param string $phone
      * @return bool
      */
-    public function validatePhoneNumber(string $phone): bool
+    public function validatePhoneNumber($phone): bool
     {
         return preg_match('/^\+?[0-9\s]+$/', $phone);
     }
@@ -316,8 +329,9 @@ class ContactDownloader
         $this->phones = [];
         $this->address = '';
         $this->title = '';
+        $this->company = '';
         $this->description = '';
-        $this->profile_image_150x150 = '';
+        $this->profile_image = '';
         $this->social = [];
         return $this;
     }
@@ -355,11 +369,14 @@ class ContactDownloader
                 case 'title':
                     $this->setTitle($value);
                     break;
+                case 'company':
+                    $this->setCompany($value);
+                    break;
                 case 'description':
                     $this->setDescription($value);
                     break;
-                case 'profile_image_150x150':
-                    $this->setProfileImage150x150($value);
+                case 'profile_image':
+                    $this->setProfileImage($value);
                     break;
                 case 'social':
                     if (is_array($value)) {
