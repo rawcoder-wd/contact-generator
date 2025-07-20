@@ -213,28 +213,29 @@ class ContactDownloader
      */
     public function vcfContent(): string
     {
-        $vcfContent = "BEGIN:VCARD\nVERSION:3.0";
+        $vcfContent = "BEGIN:VCARD\nVERSION:4.0";
         if (isset($this->full_name)) {
             $vcfContent .= "\nFN:" . $this->full_name;
             $vcfContent .= "\nN:" . $this->full_name;
         }
         if (isset($this->title)) {
             $vcfContent .= "\nTITLE:" . $this->title;
+            $vcfContent .= "\nROLE:" . $this->title;
         }
         if (isset($this->company)) {
-            $vcfContent .= "\nCOMPANY:" . $this->company;
+            $vcfContent .= "\nORG:" . $this->company;
         }
         if (isset($this->description)) {
             $vcfContent .= "\nNOTE:" . $this->description;
         }
         if (!empty($this->phones)) {
             foreach ($this->phones as $phone) {
-                $vcfContent .= "\nTEL;TYPE=" . $phone['type'] . ":" . Str::replace(' ', '', $phone['value']);
+                $vcfContent .= "\nTEL;TYPE=" . strtoupper($phone['type']) . ":" . Str::replace(' ', '', $phone['value']);
             }
         }
         if (!empty($this->emails)) {
             foreach ($this->emails as $email) {
-                $vcfContent .= "\nEMAIL;TYPE=" . $email['type'] . ":" . $email['value'];
+                $vcfContent .= "\nEMAIL;TYPE=" . strtoupper($email['type']) . ":" . $email['value'];
             }
         }
         if (isset($this->address)) {
@@ -247,7 +248,7 @@ class ContactDownloader
                         $vcfContent .= "\nURL;TYPE=WHATSAPP:https://wa.me/" . Str::remove(' ', $social);
                         break;
                     default:
-                        $vcfContent .= "\nURL;TYPE=" . Str::upper($key) . ":" . $social;
+                        $vcfContent .= "\nURL;TYPE=" . strtoupper($key) . ":" . $social;
                         break;
                 }
             }
