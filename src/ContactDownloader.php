@@ -213,7 +213,7 @@ class ContactDownloader
      */
     public function vcfContent(): string
     {
-        $vcfContent = "BEGIN:VCARD\nVERSION:4.0";
+        $vcfContent = "BEGIN:VCARD\nVERSION:3.0";
         if (isset($this->full_name)) {
             $vcfContent .= "\nFN:" . $this->full_name;
             $vcfContent .= "\nN:" . $this->full_name;
