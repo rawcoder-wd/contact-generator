@@ -229,12 +229,12 @@ class ContactDownloader
         }
         if (!empty($this->phones)) {
             foreach ($this->phones as $phone) {
-                $vcfContent .= "\nTEL;TYPE=" . strtoupper($phone['type']) . ":" . Str::replace(' ', '', $phone['value']);
+                $vcfContent .= "\nTEL;TYPE=" . $phone['type'] . ":" . Str::replace(' ', '', $phone['value']);
             }
         }
         if (!empty($this->emails)) {
             foreach ($this->emails as $email) {
-                $vcfContent .= "\nEMAIL;TYPE=" . strtoupper($email['type']) . ":" . $email['value'];
+                $vcfContent .= "\nEMAIL;TYPE=" . $email['type'] . ":" . $email['value'];
             }
         }
         if (isset($this->address)) {
@@ -247,7 +247,7 @@ class ContactDownloader
                         $vcfContent .= "\nURL;TYPE=WHATSAPP:https://wa.me/" . Str::remove(' ', $social);
                         break;
                     default:
-                        $vcfContent .= "\nURL;TYPE=" . strtoupper($key) . ":" . $social;
+                        $vcfContent .= "\nURL;TYPE=" . $key . ":" . $social;
                         break;
                 }
             }
