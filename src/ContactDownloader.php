@@ -11,12 +11,12 @@ class ContactDownloader
     private $full_name;
     private $emails = [];
     private $phones = [];
-    private $address = '';
+    private $addresses = [];
     private $title = '';
     private $company = '';
     private $description = '';
     private $profile_image = '';
-    private $social = [];
+    private $websites = [];
 
     /**
      * Set the full name for the VCF.
@@ -68,9 +68,12 @@ class ContactDownloader
      * @param string $address
      * @return $this
      */
-    public function setAddress($address): self
+    public function setAddress($address, $type): self
     {
-        $this->address = $address;
+        $this->addresses[] = [
+            'value' => $address,
+            'type' => $type
+        ];
         return $this;
     }
 
@@ -123,86 +126,17 @@ class ContactDownloader
     }
 
     /**
-     * Add a Facebook URL to the VCF.
-     *
-     * @param string $url
-     * @return $this
-     */
-    public function setFacebook($url): self
-    {
-        $this->social['facebook'] = $url;
-        return $this;
-    }
-
-    /**
-     * Add a Twitter URL to the VCF.
-     *
-     * @param string $url
-     * @return $this
-     */
-    public function setTwitter($url): self
-    {
-        $this->social['twitter'] = $url;
-        return $this;
-    }
-
-    /**
-     * Add a LinkedIn URL to the VCF.
-     *
-     * @param string $url
-     * @return $this
-     */
-    public function setLinkedin($url): self
-    {
-        $this->social['linkedin'] = $url;
-        return $this;
-    }
-
-    /**
-     * Add a YouTube URL to the VCF.
-     *
-     * @param string $url
-     * @return $this
-     */
-    public function setYoutube($url): self
-    {
-        $this->social['youtube'] = $url;
-        return $this;
-    }
-
-    /**
-     * Add an Instagram URL to the VCF.
-     *
-     * @param string $url
-     * @return $this
-     */
-    public function setInstagram($url): self
-    {
-        $this->social['instagram'] = $url;
-        return $this;
-    }
-
-    /**
      * Add a website URL to the VCF.
      *
      * @param string $url
      * @return $this
      */
-    public function setWebsite($url): self
+    public function setWebsite($website, $type): self
     {
-        $this->social['website'] = $url;
-        return $this;
-    }
-
-    /**
-     * Add a Skype URL to the VCF.
-     *
-     * @param string $url
-     * @return $this
-     */
-    public function setSkype($url): self
-    {
-        $this->social['skype'] = $url;
+        $this->websites[] = [
+            'value' => $website,
+            'type' => $type
+        ];
         return $this;
     }
 
@@ -237,19 +171,14 @@ class ContactDownloader
                 $vcfContent .= "\nEMAIL;TYPE=" . $email['type'] . ":" . $email['value'];
             }
         }
-        if (isset($this->address)) {
-            $vcfContent .= "\nADR:;;" . $this->address . ";;;";
+        if (isset($this->addresses)) {
+            foreach ($this->addresses as $address) {
+                $vcfContent .= "\nADR;TYPE=" . $address['type'] . ":" . $address['value'];
+            }
         }
-        if (!empty($this->social)) {
-            foreach ($this->social as $key => $social) {
-                switch ($key) {
-                    case 'whatsapp':
-                        $vcfContent .= "\nURL;TYPE=WHATSAPP:https://wa.me/" . Str::remove(' ', $social);
-                        break;
-                    default:
-                        $vcfContent .= "\nURL;TYPE=" . $key . ":" . $social;
-                        break;
-                }
+        if (isset($this->websites)) {
+            foreach ($this->websites as $website) {
+                $vcfContent .= "\nURL;TYPE=" . $website['type'] . ":" . $website['value'];
             }
         }
         if (isset($this->profile_image) && File::exists($this->profile_image)) {
@@ -327,12 +256,12 @@ class ContactDownloader
         $this->full_name = '';
         $this->emails = [];
         $this->phones = [];
-        $this->address = '';
+        $this->addresses = [];
         $this->title = '';
         $this->company = '';
         $this->description = '';
         $this->profile_image = '';
-        $this->social = [];
+        $this->websites = [];
         return $this;
     }
 
@@ -364,7 +293,11 @@ class ContactDownloader
                     }
                     break;
                 case 'address':
-                    $this->setAddress($value);
+                    if (is_array($value)) {
+                        foreach ($value as $address) {
+                            $this->setAddress($address['value'], $address['type']);
+                        }
+                    }
                     break;
                 case 'title':
                     $this->setTitle($value);
@@ -378,13 +311,10 @@ class ContactDownloader
                 case 'profile_image':
                     $this->setProfileImage($value);
                     break;
-                case 'social':
+                case 'website':
                     if (is_array($value)) {
-                        foreach ($value as $platform => $url) {
-                            $method = 'set' . ucfirst($platform);
-                            if (method_exists($this, $method)) {
-                                $this->$method($url);
-                            }
+                        foreach ($value as $website) {
+                            $this->setWebsite($website['value'], $website['type']);
                         }
                     }
                     break;
